@@ -35,6 +35,16 @@ class Game {
         this.background.draw();
         this.player1.draw();
         if (this.playerCount === 2) this.player2.draw();
+
+        if (pressedP1.up === true) this.moveP1("up");
+        if (pressedP1.left === true) this.moveP1("left");
+        if (pressedP1.right === true) this.moveP1("right");
+        if (pressedP1.down === true) this.moveP1("down");
+
+        if (pressedP2.up === true) this.moveP2("up");
+        if (pressedP2.left === true) this.moveP2("left");
+        if (pressedP2.right === true) this.moveP2("right");
+        if (pressedP2.down === true) this.moveP2("down");
     }
 
     stop() {
@@ -79,5 +89,4 @@ class Game {
                 break;
         }
     }
-
 }
