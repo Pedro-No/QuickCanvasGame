@@ -13,9 +13,11 @@ class Game {
         this.player1 = player1;
         this.player2 = player2;
 
+        this.playerSize = 50;
+
         this.playerCount = 1;
     
-        this.movementSpeed = 10;
+        this.movementSpeed = 5;
     }
 
     start(choice) {
@@ -59,15 +61,21 @@ class Game {
     moveP1(direction) {
         switch (direction) {
             case "up":
-                this.player1.y -= this.movementSpeed;
+                if (this.player1.y > 0) {
+                    this.player1.y -= this.movementSpeed;
+                }
                 break;
             case "left":
-                this.player1.x -= this.movementSpeed;
+                if (this.player1.x > 0) {
+                    this.player1.x -= this.movementSpeed;
+                }
                 break;
             case "right":
+                if (this.player1.x < (this.width - this.playerSize))
                 this.player1.x += this.movementSpeed;
                 break;
             case "down":
+                if (this.player1.y < (this.height - this.playerSize))
                 this.player1.y += this.movementSpeed;
                 break;
         }
@@ -76,16 +84,24 @@ class Game {
     moveP2(direction) {
         switch (direction) {
             case "up":
-                this.player2.y -= this.movementSpeed;
+                if (this.player2.y > 0) {
+                    this.player2.y -= this.movementSpeed;
+                }
                 break;
             case "left":
-                this.player2.x -= this.movementSpeed;
+                if (this.player2.x > 0) {
+                    this.player2.x -= this.movementSpeed;
+                }
                 break;
             case "right":
-                this.player2.x += this.movementSpeed;
+                if (this.player2.x < (this.width - this.playerSize)) {
+                    this.player2.x += this.movementSpeed;
+                }
                 break;
             case "down":
-                this.player2.y += this.movementSpeed;
+                if (this.player2.y < (this.height - this.playerSize)) {
+                    this.player2.y += this.movementSpeed;
+                }
                 break;
         }
     }
