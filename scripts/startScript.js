@@ -22,11 +22,9 @@ document.addEventListener("keydown", (e) => {
     } else if ((e.key === "ArrowDown" || e.key === "s") && game.state === false) {
         menu.moveDown();
     }
-});
-
-document.addEventListener("keydown", (e) => {
     if (game.state === true) {
         switch (e.key) {
+            
             // Player 1
             case "ArrowUp":
                 game.moveP1("up");
