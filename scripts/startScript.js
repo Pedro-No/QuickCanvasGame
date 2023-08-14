@@ -15,12 +15,14 @@ window.onload = () => {
 
 document.addEventListener("keydown", (e) => {
     // Menu 
-    if (e.key === "Enter" && game.state === false) {
-        menu.select();
-    } else if ((e.key === "ArrowUp" || e.key === "w") && game.state === false) {
-        menu.moveUp();
-    } else if ((e.key === "ArrowDown" || e.key === "s") && game.state === false) {
-        menu.moveDown();
+    if (game.state === false) {
+        if (e.key === "Enter") {
+            menu.select();
+        } else if (e.key === "ArrowUp" || e.key === "w") {
+            menu.moveUp();
+        } else if (e.key === "ArrowDown" || e.key === "s") {
+            menu.moveDown();
+        }
     }
     if (game.state === true) {
         switch (e.key) {
