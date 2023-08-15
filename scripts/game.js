@@ -5,7 +5,6 @@ class Game {
         this.playerCount = 1;
         
         //render Stuff
-        this.frames = 0;
         this.renderInterval = null;
 
         //sprites
@@ -17,7 +16,6 @@ class Game {
         this.weapon2 = weapon2;
 
         //physics stuff
-        this.clock = 0;
         this.physicsInterval = null;
 
         this.playerSize = 50;
@@ -25,9 +23,16 @@ class Game {
         this.blockSize = 40;
         this.ground = (canvas.height - this.playerSize - this.blockSize);
         
-        this.gravity = 10;
+        this.isGroundedP1 = true;
+        this.isGroundedP2 = true;
+        
+        this.verticalVelocityP1 = 0;
+        this.verticalVelocityP2 = 0;
+
+        this.gravity = 3;
+        this.jumpForce = -25;
+
         this.movementSpeed = 10;
-        this.jump = 50;
     }
 
     start(choice) {
@@ -74,26 +79,7 @@ class Game {
     }
 
     physicsUpdate = () => {
-        this.clock++;
-
-        //Player Movement (left, right, jump)
-        if (pressedP1.left === true) this.moveP1("left");
-        if (pressedP1.right === true) this.moveP1("right");
-        if (pressedP1.jump === true) this.player1.y -= this.jump;;
-
-        if (pressedP2.left === true) this.moveP2("left");
-        if (pressedP2.right === true) this.moveP2("right");
-        if (pressedP2.jump === true) this.player2.y -= this.jump;;
-        
-
-        //Gravity
-        if (this.player1.y < this.ground) {
-            this.player1.y += this.gravity;
-        };
-        if (this.player2.y < this.ground) {
-            this.player2.y += this.gravity;
-        };
-
+        this.updatePlayersPositions();
         this.updateWeaponPositions();
     }
 
@@ -145,18 +131,45 @@ class Game {
         setTimeout(() => {pressedP2.attack = false;},500);
     }
 
-    jumpP1() {
-        if (this.player1.y > 0 && this.player1.y === this.ground) {
-            pressedP1.jump = true;
-            setTimeout(() => {pressedP1.jump = false;},50);
-        }
-    }
+    updatePlayersPositions () {
+        //Horizontal Velocity (TBD)
+        if (pressedP1.left === true) this.moveP1("left");
+        if (pressedP1.right === true) this.moveP1("right");
 
-    jumpP2() {
-        if (this.player2.y > 0 && this.player2.y === this.ground) {
-            pressedP2.jump = true;
-            setTimeout(() => {pressedP2.jump = false;},50);
+        if (pressedP2.left === true) this.moveP2("left");
+        if (pressedP2.right === true) this.moveP2("right");
+
+        //Ground Check
+        if (this.player1.y === this.ground) {
+            this.isGroundedP1 = true;
+            this.verticalVelocityP1 = 0;
+        } else {
+            this.isGroundedP1 = false;
+        };
+        
+        if (this.player2.y === this.ground) {
+            this.isGroundedP2 = true;
+            this.verticalVelocityP2 = 0;
+        } else {
+            this.isGroundedP2 = false;
+        };
+
+        //Vertical Velocity
+        if (this.isGroundedP1 === true) {
+            if (pressedP1.jump === true) this.verticalVelocityP1 = this.jumpForce;
+        } else {
+            this.verticalVelocityP1 += this.gravity;
         }
+
+        if (this.isGroundedP2 === true) {
+            if (pressedP2.jump === true) this.verticalVelocityP2 = this.jumpForce;
+        } else {
+            this.verticalVelocityP2 += this.gravity;
+        }
+
+        //Update Position
+        this.player1.y = Math.min(this.ground, this.player1.y + this.verticalVelocityP1);        
+        this.player2.y = Math.min(this.ground, this.player2.y + this.verticalVelocityP2);
     }
 
     updateWeaponPositions() {

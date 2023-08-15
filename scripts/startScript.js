@@ -38,7 +38,7 @@ document.addEventListener("keydown", (e) => {
             
             // Player 1
             case "ArrowUp":
-                game.jumpP1();
+                pressedP1.jump = true;
                 break;
             case "ArrowLeft":
                 pressedP1.left = true;
@@ -53,9 +53,9 @@ document.addEventListener("keydown", (e) => {
             // Player 2
             case "w":
                 if(game.playerCount === 1) {
-                    game.jumpP1();
+                    pressedP1.jump = true;
                 } else {
-                    game.jumpP2();
+                    pressedP2.jump = true;
                 }
                 break;
             case "a":
@@ -87,6 +87,9 @@ document.addEventListener("keyup", (e) => {
         switch (e.key) {
             
             // Player 1
+            case "ArrowUp":
+                pressedP1.jump = false;
+                break;
             case "ArrowLeft":
                 pressedP1.left = false;
                 break;
@@ -98,6 +101,13 @@ document.addEventListener("keyup", (e) => {
                 break;
 
             // Player 2
+            case "w":
+                if(game.playerCount === 1) {
+                    pressedP1.jump = false;
+                } else {
+                    pressedP2.jump = false;
+                }
+                break;
             case "a":
                 if(game.playerCount === 1) {
                     pressedP1.left = false;
