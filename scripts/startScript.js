@@ -1,26 +1,21 @@
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
-const arrowUp = document.querySelector(".up-bttn");
-const arrowLeft = document.querySelector(".left-bttn");
-const arrowRight = document.querySelector(".right-bttn");
-const arrowDown = document.querySelector(".down-bttn");
-
 const menu = new Menu (menu_background, menu_buttons, menu_selected);
-const game = new Game (game_background, game_player1, game_player2);
+const game = new Game (game_player1, game_player2, game_enemyPC, game_sword1, game_sword2);
 
 let pressedP1 = {
-    up: false,
+    jump: false,
     left: false,
     right: false,
-    down: false,
+    attack: false,
 };
 
 let pressedP2 = {
-    up: false,
+    jump: false,
     left: false,
     right: false,
-    down: false,
+    attack: false,
 };
 
 window.onload = () => {
@@ -43,7 +38,7 @@ document.addEventListener("keydown", (e) => {
             
             // Player 1
             case "ArrowUp":
-                pressedP1.up = true;
+                game.jumpP1();
                 break;
             case "ArrowLeft":
                 pressedP1.left = true;
@@ -52,15 +47,15 @@ document.addEventListener("keydown", (e) => {
                 pressedP1.right = true;
                 break;
             case "ArrowDown":
-                pressedP1.down = true;
+                game.attackP1();
                 break;
 
             // Player 2
             case "w":
                 if(game.playerCount === 1) {
-                    pressedP1.up = true;
+                    game.jumpP1();
                 } else {
-                    pressedP2.up = true;
+                    game.jumpP2();
                 }
                 break;
             case "a":
@@ -79,9 +74,9 @@ document.addEventListener("keydown", (e) => {
                 break;
             case "s":
                 if(game.playerCount === 1) {
-                    pressedP1.down = true;
+                    game.attackP1();
                 } else {
-                    pressedP2.down = true;
+                    game.attackP2();
                 }
                 break;
     }}
@@ -92,9 +87,6 @@ document.addEventListener("keyup", (e) => {
         switch (e.key) {
             
             // Player 1
-            case "ArrowUp":
-                pressedP1.up = false;
-                break;
             case "ArrowLeft":
                 pressedP1.left = false;
                 break;
@@ -106,13 +98,6 @@ document.addEventListener("keyup", (e) => {
                 break;
 
             // Player 2
-            case "w":
-                if(game.playerCount === 1) {
-                    pressedP1.up = false;
-                } else {
-                    pressedP2.up = false;
-                }
-                break;
             case "a":
                 if(game.playerCount === 1) {
                     pressedP1.left = false;

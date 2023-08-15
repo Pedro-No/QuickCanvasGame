@@ -1,23 +1,33 @@
 class Game {
-    constructor(background, player1, player2) {
+    constructor(player1, player2, enemyPC, weapon1, weapon2) {
+        //game stuff
         this.state = false;
+        this.playerCount = 1;
         
-        this.width = canvas.width;
-        this.height = canvas.height;
-        
+        //render Stuff
         this.frames = 0;
-        this.intervalRender = null;
+        this.renderInterval = null;
 
-        this.background = background;
-
+        //sprites
         this.player1 = player1;
+        this.weapon1 = weapon1;
+
         this.player2 = player2;
+        this.enemyPC = enemyPC;
+        this.weapon2 = weapon2;
+
+        //physics stuff
+        this.clock = 0;
+        this.physicsInterval = null;
 
         this.playerSize = 50;
-
-        this.playerCount = 1;
-    
-        this.movementSpeed = 5;
+        this.weaponSize = 70;
+        this.blockSize = 40;
+        this.ground = (canvas.height - this.playerSize - this.blockSize);
+        
+        this.gravity = 10;
+        this.movementSpeed = 10;
+        this.jump = 50;
     }
 
     start(choice) {
@@ -27,31 +37,69 @@ class Game {
         
         this.state = true;
 
-        this.intervalRender = setInterval(this.update, 10);
+        this.renderInterval = setInterval(this.renderUpdate, 1);
+        this.physicsInterval = setInterval(this.physicsUpdate, 20);
+
+        //player starting positions
+        this.player1.x = (canvas.width / 6);
+        this.player1.y = this.ground;
+
+        this.player2.x = (canvas.width - (canvas.width / 6) - this.playerSize);
+        this.player2.y = this.ground;
+
+        this.enemyPC.x = (canvas.width - (canvas.width / 6) - this.playerSize);
+        this.enemyPC.y = this.ground;
     }
 
-    update = () => {
+    renderUpdate = () => {
         this.frames++;
         this.clear();
+        game_background.draw();
 
-        this.background.draw();
-        this.player1.draw();
-        if (this.playerCount === 2) this.player2.draw();
+        // Render Players
+        if (this.playerCount === 1) {
+            this.player1.draw();
+            this.enemyPC.draw();
+            if (pressedP1.attack === true) this.weapon1.draw();
+            if (pressedP2.attack === true) this.weapon2.draw();
+        }
+        if (this.playerCount === 2) {
+            this.player1.draw();
+            this.player2.draw();
+            if (pressedP1.attack === true) this.weapon1.draw();
+            if (pressedP2.attack === true) this.weapon2.draw();
+        }
 
-        if (pressedP1.up === true) this.moveP1("up");
-        if (pressedP1.left === true) this.moveP1("left");
-        if (pressedP1.right === true) this.moveP1("right");
-        if (pressedP1.down === true) this.moveP1("down");
-
-        if (pressedP2.up === true) this.moveP2("up");
-        if (pressedP2.left === true) this.moveP2("left");
-        if (pressedP2.right === true) this.moveP2("right");
-        if (pressedP2.down === true) this.moveP2("down");
+        game_floor.draw();
     }
 
-    stop() {
-        clearInterval(this.intervalPhysics);
-        clearInterval(this.intervalRender);
+    physicsUpdate = () => {
+        this.clock++;
+
+        //Player Movement (left, right, jump)
+        if (pressedP1.left === true) this.moveP1("left");
+        if (pressedP1.right === true) this.moveP1("right");
+        if (pressedP1.jump === true) this.player1.y -= this.jump;;
+
+        if (pressedP2.left === true) this.moveP2("left");
+        if (pressedP2.right === true) this.moveP2("right");
+        if (pressedP2.jump === true) this.player2.y -= this.jump;;
+        
+
+        //Gravity
+        if (this.player1.y < this.ground) {
+            this.player1.y += this.gravity;
+        };
+        if (this.player2.y < this.ground) {
+            this.player2.y += this.gravity;
+        };
+
+        this.updateWeaponPositions();
+    }
+
+    reset() {
+        clearInterval(this.physicsInterval);
+        clearInterval(this.renderInterval);       
     }
 
     clear() {
@@ -60,49 +108,62 @@ class Game {
 
     moveP1(direction) {
         switch (direction) {
-            case "up":
-                if (this.player1.y > 0) {
-                    this.player1.y -= this.movementSpeed;
-                }
-                break;
             case "left":
                 if (this.player1.x > 0) {
                     this.player1.x -= this.movementSpeed;
                 }
                 break;
             case "right":
-                if (this.player1.x < (this.width - this.playerSize))
+                if (this.player1.x < (canvas.width - this.playerSize))
                 this.player1.x += this.movementSpeed;
-                break;
-            case "down":
-                if (this.player1.y < (this.height - this.playerSize))
-                this.player1.y += this.movementSpeed;
                 break;
         }
     }
 
     moveP2(direction) {
         switch (direction) {
-            case "up":
-                if (this.player2.y > 0) {
-                    this.player2.y -= this.movementSpeed;
-                }
-                break;
             case "left":
                 if (this.player2.x > 0) {
                     this.player2.x -= this.movementSpeed;
                 }
                 break;
             case "right":
-                if (this.player2.x < (this.width - this.playerSize)) {
+                if (this.player2.x < (canvas.width - this.playerSize)) {
                     this.player2.x += this.movementSpeed;
-                }
-                break;
-            case "down":
-                if (this.player2.y < (this.height - this.playerSize)) {
-                    this.player2.y += this.movementSpeed;
                 }
                 break;
         }
     }
+
+    attackP1() {
+        pressedP1.attack = true;
+        setTimeout(() => {pressedP1.attack = false;},500);
+    }
+
+    attackP2() {
+        pressedP2.attack = true;
+        setTimeout(() => {pressedP2.attack = false;},500);
+    }
+
+    jumpP1() {
+        if (this.player1.y > 0 && this.player1.y === this.ground) {
+            pressedP1.jump = true;
+            setTimeout(() => {pressedP1.jump = false;},50);
+        }
+    }
+
+    jumpP2() {
+        if (this.player2.y > 0 && this.player2.y === this.ground) {
+            pressedP2.jump = true;
+            setTimeout(() => {pressedP2.jump = false;},50);
+        }
+    }
+
+    updateWeaponPositions() {
+        this.weapon1.x = this.player1.x
+        this.weapon1.y = (this.player1.y - this.weaponSize - 10);
+
+        this.weapon2.x = this.player2.x
+        this.weapon2.y = (this.player2.y - this.weaponSize - 10);
+    };
 }
